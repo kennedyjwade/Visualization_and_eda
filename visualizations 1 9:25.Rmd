@@ -218,11 +218,16 @@ ggp_weather_violin =
 
 ggp_weather_violin
 
-ggsabe("plots/violin_plot.pdf", ggp_weather_violin,
+ggsave("plots/violin_plot.pdf", ggp_weather_violin,
        width = 8, height = 6)
 ```
 
 
+embedding plots 
+
+```{r, fig.width = 6, fig.height =4}
+  ggp_weather_violin
+```
 
 
 
