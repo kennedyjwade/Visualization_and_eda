@@ -76,13 +76,180 @@ weather_df |>
   geom_point(aes(color = name, size =prcp), alpha = 0.3) +
   geom_smooth(se =FALSE) +
   facet_grid(.~name)
+
 ```
-```
+
 Learning assessment plot 
 
 ```{r}
+weather_df |> 
+filter(name == "CentralPark_NY") |> 
+mutate(
+  tmax_fahr = tmax * (9/5) +32,
+  tmin_fahr = tmin * (9/5) +32
+ ) |>
+ ggplot(aes(x = tmin_fahr, y = tmax_fahr)) +
+ geom_point() +
+ geom_smooth(se = FALSE, method = "lm")
+```
+
+##small things 
+you can take things out by commenting them out (add#) 
+geom_smoooth should be last funtion
+```{r}
+weather_df |>
+  ggplot(aes(x=tmin, y=tmax, color = name, shape = name)) +
+ # geom_point(alpha = 0.3) +
+  geom_smooth(se =FALSE) 
+
+weather_df |>
+  ggplot(aes(x=tmin, y=tmax, color = name, shape = name)) +
+  geom_smooth(se =FALSE) 
+  geom_point()
 
 ```
+
+adding hexagonal plot 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x=tmin, y=tmax)) +
+  geom_hex()
+  
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(color = "purple")
+```
+
+##univariate point
+making a historgram 
+color is for the outline, fill is for the inside of the bars 
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin)) +
+  geom_histogram(color = "white", fill = "red")
+```
+
+overlapping histogram
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, color = name)) + 
+  geom_histogram()
+
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) + 
+  geom_histogram()
+```
+
+add facet grid to make sure they are not overlapping
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) + 
+  geom_histogram() +
+  facet_grid(name~.)
+```
+
+or you coudld make a desnsity plot 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) + 
+  geom_density() 
+```
+
+making a boxplot 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmin)) + 
+  geom_boxplot(aes(fill = name))
+```
+
+violin plot 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) + 
+  geom_violin()
+```
+
+ridge plot
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = name, fill = name)) + 
+  geom_density_ridges()
+```
+
+learning assessment univariate plots 
+
+learning assessment: make plots that com,pare precipitation across locations. try histogram, a density plot,  boxplot, a violin plot, and a ridgeplot; Uuse asethetic mappings to make your figure readable 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x =prcp, fill = name)) + 
+  geom_density(alpha = 0.2)
+
+weather_df |> 
+  ggplot(aes(x =prcp, fill = name)) + 
+  geom_histogram() +
+  facet_grid(name~.)
+
+weather_df |> 
+  filter(prcp >5, prcp < 1000) |>
+  ggplot(aes(x =prcp, fill = name)) +
+  geom_density(alpha = 0.2)
+
+```
+
+#saving plots 
+
+```{r}
+ggp_weather_violin = 
+  weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin()
+
+ggp_weather_violin
+
+ggsabe("plots/violin_plot.pdf", ggp_weather_violin,
+       width = 8, height = 6)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
