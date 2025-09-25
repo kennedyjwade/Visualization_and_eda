@@ -1,0 +1,100 @@
+---
+title: "Viz 9/25"
+author: "Kennedy Wade"
+date: "2025-09-25"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(ggridges)
+library(p8105.datasets)
+```
+
+Import the dataset
+
+```{r}
+data("weather_df")
+```
+
+```{r}
+ggplot(data = weather_df, mapping = aes(x=tmin, y=tmax)) +
+  geom_point()
+```
+
+```{r}
+waether_df |>
+  ggp;lot(aes(x=tmin, y=tmax)) + 
+  geom_point()
+
+ggp_weather_scatterplot
+```
+
+check that some rows are missing
+
+```{r}
+weather_df |>
+  filter(is.na(tmax))
+```
+
+##fancier Scatterplots!
+Different aestheics functions:
+alpha makes the ppints on the scatterplot more transparent to see the density
+geom_smooth creates tge trendline
+all the lines that go under the ggplot are applied unless specified otherwise 
+prcp is precipitation variable in the climate dataset 
+```{r}
+weather_df |>
+  ggplot(aes(x=tmin, y=tmax, color = name)) +
+  geom_point(aes(color = name, size =prcp), alpha = 0.3) +
+  geom_smooth(se =FALSE)
+```
+
+use faceting 
+
+```{r}
+weather_df |>
+  ggplot(aes(x=tmin, y=tmax, color = name)) +
+  geom_point(aes(color = name, size =prcp), alpha = 0.3) +
+  geom_smooth(se =FALSE) +
+  facet_grid(.~name)
+```
+
+```{r}
+weather_df |>
+  ggplot(aes(x=tmin, y=tmax, color = name)) +
+  geom_point(aes(color = name, size =prcp), alpha = 0.3) +
+  geom_smooth(se =FALSE) +
+  facet_grid(name ~.)
+```
+
+lets make a more interesting scatterplot (shape)
+
+```{r}
+weather_df |>
+  ggplot(aes(x=tmin, y=tmax, color = name, shape = name)) +
+  geom_point(aes(color = name, size =prcp), alpha = 0.3) +
+  geom_smooth(se =FALSE) +
+  facet_grid(.~name)
+```
+```
+Learning assessment plot 
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
