@@ -1,0 +1,224 @@
+---
+title: "EDA 10/2"
+author: "Kennedy Wade"
+date: "2025-10-02"
+output: github_document
+---
+
+loading datasets 
+
+```{r}
+library(p8105.datasets)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyverse)
+```
+
+loading the data 
+
+```{r}
+data("weather_df")
+
+weather_df = 
+  weather_df |>
+  mutate(
+    month = lubridate::floor_date(date, unit = "month"))
+
+```
+
+Make plots
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = prcp)) + 
+  geom_histogram()
+  
+```
+
+check extreme values 
+
+```{r}
+weather_df |> 
+  filter(prcp >= 1000)
+```
+
+look at the data again
+
+```{r}
+weather_df |> 
+  filter(tmax >= 20, tmax <= 30) |> 
+  ggplot(aes(x = tmin, y = tmax, color = name, shape = name)) + 
+  geom_point(alpha = .75)
+```
+
+## Add groups 
+
+`group_by()` makes these groupings explicit so that they can be included in subsequent operations. For example, we might group weather_df by name and month:
+
+```{r}
+weather_df |>
+  group_by(name, month)
+```
+
+grouping and counting things 
+(grouping by name and summarizing what u have)
+```{r}
+weather_df |>
+  group_by(name,month) |>
+  summarize(
+    n =n()
+  )
+```
+
+grouping with an n_distinct 
+ (will count u distinct instances not just number)
+ 
+```{r}
+weather_df |>
+  group_by(month) |>
+  summarize(
+    n = n_distinct(date))
+```
+ 
+you can count directly
+
+```{r}
+weather_df |>
+  count(name)
+```
+
+## More interesting summaries 
+
+```{r}
+weather_df |>
+  group_by(name, month) |>
+  summarize(
+    mean_tmax = mean(tmax, na.rm =TRUE),
+    median_tmin = median(tmin, na.rm =TRUE),
+    sd_prcp =sd(prcp, na.rm = TRUE)
+  )
+```
+
+
+
+```{r}
+weather_df |>
+  group_by(name,month) |>
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE)
+  ) |>
+  ggplot(aes( x= month, y = mean_tmax, color = name)) +
+  geom_point() +
+  geom_line()
+```
+
+
+can see what things look like seasonally and make it more visually appealing with pivot_wider
+
+```{r}
+weather_df |>
+  group_by(name,month) |>
+  summarize(
+    mean_tmax = mean(tmax, na.rm = TRUE)
+  ) |>
+  pivot_wider(
+    names_from = name,
+    values_from = mean_tmax
+  ) |>
+  knitr::kable(digits = 2)
+```
+
+
+## mutate with groups 
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    center_tmax = tmax - mean_tmax
+  ) |> 
+  ggplot(aes( x = date, y = center_tmax, color = name)) +
+  geom_point()
+```
+
+
+Looking for cold days 
+
+```{r}
+weather_df |>
+  group_by(name, month) |>
+  mutate(temp_rank = min_rank(desc(tmin))) |>
+  filter(temp_rank < 2)
+```
+
+What about lags?
+
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(lagged_tmax = lag(tmax))
+```
+
+use the variables you create
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(
+    temp_change = tmax - lag(tmax)
+) |> 
+  summarize(
+    sd_tmax_change = sd(temp_change, na.rm = TRUE),
+    tmax_change_max = max(temp_change, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+weather_df |>
+  group_by(name) |>
+  mutate(
+    temp_change = tmax - lag(tmax),
+    change_rank = min_rank(desc(temp_change))
+) |> 
+  filter(
+    change_rank < 2
+  )
+```
+
+Leanring Assessment: write a code chunk that imports, cleans, and summarizes the PULSE data to examine the mean and median at each visit. Export the results of this in a reader-friendly format.
+
+```{r}
+pulse_df = 
+  haven::read_sas("./data/public_pulse_data.sas7bdat") |>
+  janitor::clean_names() |>
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m,
+    names_to = "visit", 
+    names_prefix = "bdi_score_",
+    values_to = "bdi") |>
+  select(id, visit, everything()) |>
+  mutate(
+    visit = replace(visit, visit == "bl", "00m"),
+    visit = factor(visit, levels = str_c(c("00", "01", "06", "12"), "m"))) |>
+  arrange(id, visit)
+
+pulse_df |> 
+  group_by(visit) |> 
+  summarize(
+    mean_bdi = mean(bdi, na.rm = TRUE),
+    median_bdi = median(bdi, na.rm = TRUE)) |> 
+  knitr::kable(digits = 3)
+```
+
+
+
+
+
+
+
+
+
